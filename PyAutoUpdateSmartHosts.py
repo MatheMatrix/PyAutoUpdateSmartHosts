@@ -1,38 +1,59 @@
 # -*- coding: utf-8 -*-
 
-'''默认hosts文件第一部分来自smarthosts，后边随意
+'''要求第一次使用时前Smarthosts文件最好完整保存在hosts文件内
+hosts文件内除SmartHosts内使用的 无形如"#UPDATE:XXXX-XX-XX XX:XX"样标记
 '''
 
 import httplib2
 import shutil
 import os
+import sys
+import re
 
 # Get some data
 
-strURL = 'https://smarthosts.googlecode.com/svn/trunk/hosts'
+strURL = 'http://smarthosts.googlecode.com/svn/trunk/hosts'
 strPath = 'C:\\WINDOWS\\system32\\drivers\\etc\\'
-listRemoteHosts = []
+listLocalHosts = []
+strContent = ''
 
 h = httplib2.Http('cache')
 strResponse, bContent = h.request(strURL)
 
+for ch in bContent.decode('utf-8'):
+	if ch == '\r':
+		pass
+	else:
+		strContent = strContent + ch
+
 if 'hosts' in os.listdir(strPath):
 	with open(strPath + 'hosts', 'r') as fileHosts:
 		for strLine in fileHosts:
-			listRemoteHosts.append(strLine)
+			listLocalHosts.append(strLine)
 else:
 	fileHosts = open(strPath + 'hosts', 'w')
 	fileHosts.close()
 
 # def functions
 
+def FindLocalTimeStamp():
+	'''Find time stamp of local hosts
+	'''
+
+	strPattern = re.compile(r'#UPDATE:\d{4}-\d{2}-\d{2} \d{2}:\d{2}')
+	for strTemp in listLocalHosts:
+		if len(re.findall(strPattern, strTemp)) > 0:
+			strLocalTimeStamp = re.findall(strPattern, strTemp)[0]
+			break
+
+	return strLocalTimeStamp
+
 def CmpTimeStamp():
 	'''Compare Timestamp between local and remote
 	'''
 
 	strRemoteTimeStamp = bContent.decode('utf-8').split('\n')[0].rstrip()
-
-	strLocalTimeStamp = listRemoteHosts[0].rstrip()
+	strLocalTimeStamp = FindLocalTimeStamp()
 
 	return(strRemoteTimeStamp == strLocalTimeStamp)
 
@@ -50,30 +71,48 @@ def UpdateHosts():
 	'''
 
 	print('Now update your hosts to the lastest version.')
-	listOldHosts = []
+	listOldHostsTail = []
+	listOldHostsHead = []
 	with open(strPath + 'hosts', 'r') as fileHosts:
+
+		print('Now copy strings in your hosts before SmartHosts...')
+		for strLine in fileHosts:
+			if (strLine.rstrip() == FindLocalTimeStamp()):
+				break
+			listOldHostsHead.append(strLine)
 
 		for strLine in fileHosts:
 			if(strLine.rstrip() == '#SmartHosts END'):
 				break
+
+		print('Now copy strings in your hosts after SmartHosts...')
 		for strLine in fileHosts:
-			listOldHosts.append(strLine)
+			listOldHostsTail.append(strLine)
 
 	
 	with open(strPath + 'hosts.new', 'w') as fileHostsNew:
-		for strTemp in listRemoteHosts:
-			fileHostsNew.write(strTemp)
-		for strTemp in listOldHosts:
-			fileHostsNew.write(strTemp)
+
+		print('Now writing...')
+
+		old_out = sys.stdout
+		sys.stdout = fileHostsNew
+		for strTemp in listOldHostsHead:
+			sys.stdout.write(strTemp)
+		sys.stdout.write(strContent)
+		for strTemp in listOldHostsTail:
+			sys.stdout.write(strTemp)
+		sys.stdout = old_out
 
 	os.remove(strPath + 'hosts')
 	os.rename(strPath + 'hosts.new', strPath + 'hosts')
+	print('\nSuccessed!')
 
 
-if __name__ == '__main__':
-	if CmpTimeStamp() == False:
-		print('Therer are new version in googlecode.')
-		MakeBackup()
-		UpdateHosts()
-	else:
-		print('Your hosts is the latest version.')
+if CmpTimeStamp() == False:
+	print('Therer are new version in googlecode.\n')
+	MakeBackup()
+	UpdateHosts()
+else:
+	print('Your hosts is the latest version.')
+
+# os.system("pause")
