@@ -17,6 +17,8 @@ Update my hosts to the latest version of smart hosts automatically
 
 5.不能自动清理生产的cache文件夹
 
+6.无法处理用户Windows系统未安装在C盘或当前Windows系统目录不再C盘的情况
+
 
 ###使用方法：
 
