@@ -7,17 +7,17 @@ Update my hosts to the latest version of smart hosts automatically
 
 ###目前已知问题：
 
-1.对受系统读写保护Hosts无法更新
+ - 对受系统读写保护Hosts无法更新(Linux)
 
-2.不支持Linux系统
+ - ~~不支持Linux系统~~
 
-3.无境内版和境外版的选择选项
+ - ~~无境内版和境外版的选择选项~~
 
-4.hosts文件里不能有第二个像#UPDATE:XXXX-XX-XX XX:XX这样的标记
+ - hosts文件里不能有第二个像#UPDATE:XXXX-XX-XX XX:XX这样的标记
 
-5.不能自动清理生产的cache文件夹
+ - 不能自动清理生产的cache文件夹
 
-6.无法处理用户Windows系统未安装在C盘或当前Windows系统目录不在C盘的情况
+ - ~~无法处理用户Windows系统未安装在C盘或当前Windows系统目录不在C盘的情况~~
 
 
 ###使用方法：
