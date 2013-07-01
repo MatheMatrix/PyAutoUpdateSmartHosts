@@ -15,7 +15,7 @@ Update my hosts to the latest version of smart hosts automatically
 
  - hosts文件里不能有第二个像#UPDATE:XXXX-XX-XX XX:XX这样的标记
 
- - 不能自动清理生产的cache文件夹
+ - ~~不能自动清理生产的cache文件夹~~
 
  - ~~无法处理用户Windows系统未安装在C盘或当前Windows系统目录不在C盘的情况~~
 
